@@ -1,0 +1,68 @@
+---
+language: rust
+sudo: false
+dist: trusty
+
+rust:
+  - stable
+  - beta
+  - nightly
+
+os:
+  - linux
+  - osx
+
+matrix:
+  allow_failures:
+    - rust: beta
+    - rust: stable
+
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - cmake
+      - gcc
+      - binutils-dev
+      - libiberty-dev
+
+before_script:
+  - |
+    if [ $TRAVIS_OS_NAME = linux ] && [ $TRAVIS_RUST_VERSION = nightly ]; then
+      pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
+    fi
+
+script:
+  - cargo build
+  - cargo test
+
+after_success:
+  - |
+    if [ $TRAVIS_OS_NAME = linux ] && [ $TRAVIS_RUST_VERSION = nightly ]; then
+      wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz
+      tar xzf master.tar.gz && mkdir -p kcov-master/build && cd kcov-master/build
+      cmake .. && make && make install DESTDIR=../../kcov-build && cd ../..
+      rm -rf kcov-master
+      for f in target/debug/connectron-*[^\.d]; do
+        mkdir -p "target/cov/$(basename $f)"
+        ./kcov-build/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $f)" "$f"
+      done
+      bash <(curl -s https://codecov.io/bash)
+      echo "Uploaded code coverage"
+    fi
+  - |
+    if [ $TRAVIS_OS_NAME = linux ] && [ $TRAVIS_RUST_VERSION = nightly ]; then
+      travis-cargo doc-upload
+    fi
+
+env:
+  global:
+    - RUSTFLAGS="-C link-dead-code"
+    - secure: aSTCQL0QE4G5Ohb+QFIags+ehPp6EZPykydsLSDHCxNh++lybVnGv/ek9TzQcdzZVwNCansEc+V+ZhkXTSGqkt0kxAr5lZLuQtGuATaEBngTcjdk1Tydosnq54c1jg+IAnmSoo1m7OVA5CZ7FI7zBjuxjCOQerEbfp/Qf4oWDV9nSiuYikxGAH3qHwlUcIKQtboKuxU96FgZqJTgers1JXRunL/Vn3GyEcl+6FM82wRB8FxKB9N/0GK+Ltvwma0Uxr37fWI3oEq/r+Tg5rrz3M3bJk5jdT2Nuu5UQICZ0HAvljGAlDKwBS+SurX5k/fWEm3BPwK8xahw0qIrEDyPQYYgfV1xB095PmbrX0mRng0hyZknquWecQa8Qng8pxuK1g6V5xB7Fu5iBgzhshLMoBX3KqI05/N2zgyQ3tAnST12UiVjsk2C4EZ8lbEHWrn9M2k2Utu+fb3/mlYR1m+GZsdu7+clR+3R0GX8E+OBdzcSaj4su0za57lM8bVrzENJdGeT47aLt9l6uUpMLIiGR1+C5j57nQQAq90yiBfjNWpAC2xEK26G/b9r1cTd+s9NbXVnu3XQK5EC0Ed5HSe5TbZgT6qGs9/Mgz9QbSdS2pP/x0N/qFrrK/ktqAWx3Skex/Cf0nH2KN4VJFiw8uePWL2EfVSFf+RyY6HzzEurNLo=
+    - secure: PigMkU67DgZVMQxCaLGXAYJdTIMPVjyJzdsjiGAVc+z513xMZAAkBHj3wSxmcQvoftdrktJx9nWhEKsTQ3/iSCzdAr2AkloKYy+oxvUmxRFmYd5lYo3GTy1Kd4bwfxT2l0/gtgO1yeNFqIsLfCof7AlPOW+DzyWytB0M3p59w46yHKJVckaL9cZJpEriGto9YzKkkoDzOR6A6iRX2wf5djsjPMhlil9M/5OGhWT33HEs+jNhBelnS6YYvEo2pzrA/z2yPEgKOBKDblidq2/U6ixNOdlecvkYzrAu4pcM7eh7xQIe2jND+FrhHnf0kDjHupsYEDHeuDwKF8DYONKLaact+i18htFX4o+Fuv3TpJxkZzeutCod2+VM8EqPkN4S8n/jvFK08YcWl3ld60fdlh+R1guEU+CUCS9YY38sQW9BXUfzSVCg7IBFHOQcMRfD4V0Hjglg3nPUJzMIqmZMf46L3BIZqlB6392BFnHbgb0wyVuWNqfMfKLBmu/+i+WLqwxBuWnxtIRurKiF9kmbhOeMYYJ3p+mOWoaNDX+5tn/qXwNOZid3ppEQhjMWnHI4a7hGvRRMXTkP2UOXPoMqPO7O/n2e1XcN0GiirqBL8Zp0MFvLTV2sEH8w8eqc/U2z9YOiSKuSFrT6b1e8yVICNUkwIpUTR1Vu1+OzsWWGLZo=
+
+notifications:
+  email:
+    on_success: never

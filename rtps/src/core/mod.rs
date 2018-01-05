@@ -1,8 +1,10 @@
 mod error;
 mod guid;
+mod locator;
 
 pub use self::error::{Error, ErrorKind, Result};
 pub use self::guid::{EntityId, Guid, GuidPrefix};
+pub use self::locator::{Locator, LocatorKind};
 
 use std::{cmp::Ordering, ops::{Deref, DerefMut}};
 

@@ -1,9 +1,9 @@
 [package]
-name = "connectron"
+name = "connectron-rtps"
 version = "0.0.1"
 authors = ["Katsutoshi Horie <mps299792458@gmail.com>"]
 description = "Empty crate, used only to reserve the name."
-documentation = "https://docs.rs/connectron"
+documentation = "https://docs.rs/connectron-rtps"
 homepage = "https://connectron.org"
 repository = "https://github.com/connectron/connectron"
 readme = "README.md"
@@ -16,6 +16,4 @@ codecov = { repository = "connectron/connectron" }
 
 [dependencies]
 failure = "0.1"
-
-[workspace]
-members = ["rtps"]
+failure_derive = "0.1"

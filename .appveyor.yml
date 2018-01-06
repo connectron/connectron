@@ -27,5 +27,5 @@ install:
 build: false
 
 test_script:
-  - cargo build --all
-  - cargo test --all
+  - cargo build --verbose --all
+  - cargo test --verbose --all

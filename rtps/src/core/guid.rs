@@ -115,15 +115,15 @@ impl GuidPrefix {
             .iter()
             .filter(|i| !i.is_loopback())
             .next()
-            .map(|i| i.ips.iter().next().map(|ip| ip.ip()))
+            .and_then(|i| i.ips.iter().next().map(|ip| ip.ip()))
         {
-            Some(Some(IpAddr::V4(addr))) => addr.octets()
+            Some(IpAddr::V4(addr)) => addr.octets()
                 .iter()
                 .rev()
                 .take(2)
                 .cloned()
                 .collect::<Vec<_>>(),
-            Some(Some(IpAddr::V6(addr))) => addr.octets()
+            Some(IpAddr::V6(addr)) => addr.octets()
                 .iter()
                 .rev()
                 .take(2)
@@ -134,7 +134,6 @@ impl GuidPrefix {
         let pid = unsafe { libc::getpid() } as i32;
         let pid = unsafe { mem::transmute::<i32, [u8; 4]>(pid.to_be()) };
         let id = unsafe { mem::transmute::<i32, [u8; 4]>(participant_id.to_be()) };
-
         let inner = [
             vendor_id[0],
             vendor_id[1],

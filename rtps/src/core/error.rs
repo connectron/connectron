@@ -1,4 +1,4 @@
-use std::{self, io, fmt::{self, Display}};
+use std::{self, fmt::{self, Display}};
 
 use failure::{Backtrace, Context, Fail};
 
@@ -47,8 +47,28 @@ impl From<Context<ErrorKind>> for Error {
     }
 }
 
+impl From<std::io::Error> for Error {
+    fn from(err: std::io::Error) -> Self {
+        ErrorKind::Io(err).into()
+    }
+}
+
+impl From<std::num::TryFromIntError> for Error {
+    fn from(err: std::num::TryFromIntError) -> Self {
+        ErrorKind::TryFromInt(err).into()
+    }
+}
+
+impl From<std::time::SystemTimeError> for Error {
+    fn from(err: std::time::SystemTimeError) -> Self {
+        ErrorKind::SystemTime(err).into()
+    }
+}
+
 /// The kind of an error.
 #[derive(Debug, Fail)]
 pub enum ErrorKind {
-    #[fail(display = "{}", _0)] Io(#[cause] io::Error),
+    #[fail(display = "{}", _0)] Io(#[cause] std::io::Error),
+    #[fail(display = "{}", _0)] TryFromInt(#[cause] std::num::TryFromIntError),
+    #[fail(display = "{}", _0)] SystemTime(#[cause] std::time::SystemTimeError),
 }

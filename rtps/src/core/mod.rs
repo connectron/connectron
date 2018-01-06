@@ -9,7 +9,7 @@ pub use self::locator::{Locator, LocatorKind};
 use std::{cmp::Ordering, ops::{Deref, DerefMut}};
 
 /// Type used to represent the version of the RTPS protocol.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct ProtocolVersion {
     major: u8,
     minor: u8,
@@ -44,7 +44,7 @@ impl PartialOrd for ProtocolVersion {
 }
 
 /// Type used to represent the vendor of the service implementing the RTPS protocol.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct VendorId([u8; 2]);
 
 impl VendorId {

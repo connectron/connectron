@@ -2,7 +2,7 @@ use std::net::{IpAddr, SocketAddr};
 
 /// Type used to represent the addressing information needed to send a message
 /// to an RTPS Endpoint using one of the supported transports.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Locator {
     kind: i32,
     port: u32,
@@ -53,7 +53,7 @@ impl Default for Locator {
 }
 
 /// Type used to identify the transport that receives the message.
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum LocatorKind {
     Invalid,
     Reserved,

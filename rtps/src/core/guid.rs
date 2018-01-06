@@ -5,7 +5,7 @@ use libc;
 use pnet;
 
 /// Type used to hold globally-unique RTPS-entity identifiers.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Guid {
     prefix: GuidPrefix,
     entity_id: EntityId,
@@ -105,7 +105,7 @@ impl Guid {
 }
 
 /// Type used to hold the prefix of the globally-unique RTPS-entity identifiers.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct GuidPrefix([u8; 12]);
 
 impl GuidPrefix {
@@ -179,7 +179,7 @@ impl DerefMut for GuidPrefix {
 }
 
 /// Type used to hold the suffix part of the globally-unique RTPS-entity identifiers.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct EntityId([u8; 4]);
 
 impl EntityId {

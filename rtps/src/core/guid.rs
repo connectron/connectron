@@ -292,14 +292,14 @@ mod tests {
         let prefix = GuidPrefix::automatic(id);
         assert_eq!(prefix[0], VendorId::default()[0]);
         assert_eq!(prefix[1], VendorId::default()[1]);
-        assert_eq!(prefix[4], (pid.to_be() & 255) as u8);
-        assert_eq!(prefix[5], ((pid.to_be() >> 8) & 255) as u8);
-        assert_eq!(prefix[6], ((pid.to_be() >> 16) & 255) as u8);
-        assert_eq!(prefix[7], ((pid.to_be() >> 24) & 255) as u8);
-        assert_eq!(prefix[8], (id.to_be() & 255) as u8);
-        assert_eq!(prefix[9], ((id.to_be() >> 8) & 255) as u8);
-        assert_eq!(prefix[10], ((id.to_be() >> 16) & 255) as u8);
-        assert_eq!(prefix[11], ((id.to_be() >> 24) & 255) as u8);
+        assert_eq!(prefix[4], pid.to_be() as u8);
+        assert_eq!(prefix[5], (pid.to_be() >> 8) as u8);
+        assert_eq!(prefix[6], (pid.to_be() >> 16) as u8);
+        assert_eq!(prefix[7], (pid.to_be() >> 24) as u8);
+        assert_eq!(prefix[8], id.to_be() as u8);
+        assert_eq!(prefix[9], (id.to_be() >> 8) as u8);
+        assert_eq!(prefix[10], (id.to_be() >> 16) as u8);
+        assert_eq!(prefix[11], (id.to_be() >> 24) as u8);
     }
 
     #[test]

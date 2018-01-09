@@ -20,6 +20,15 @@ impl Time {
     }
 
     #[inline]
+    pub fn is_valid(&self) -> bool {
+        if self.seconds < 0 {
+            false
+        } else {
+            true
+        }
+    }
+
+    #[inline]
     pub fn infinite() -> Self {
         Self::new(0x7fffffff, 0xffffffff)
     }
@@ -27,15 +36,6 @@ impl Time {
     #[inline]
     pub fn invalid() -> Self {
         Self::new(-1, 0xffffffff)
-    }
-
-    #[inline]
-    pub fn is_valid(&self) -> bool {
-        if self.seconds < 0 {
-            false
-        } else {
-            true
-        }
     }
 
     pub fn now() -> Result<Self> {
@@ -358,5 +358,12 @@ mod tests {
     #[should_panic]
     fn invalid_div() {
         Time::new(0, 1) / -1;
+    }
+
+    #[test]
+    fn order() {
+        assert!(Time::new(0, 1) < Time::new(0, 2));
+        assert!(Time::new(0, 1) < Time::new(1, 0));
+        assert!(Time::new(1, 0) < Time::new(1, 1));
     }
 }

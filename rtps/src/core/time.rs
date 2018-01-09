@@ -124,7 +124,7 @@ impl Add for Time {
 
     fn add(self, rhs: Self) -> Self {
         self.checked_add(rhs)
-            .expect("add invalid times or overflow when adding times")
+            .expect("invalid values or overflow when adding times")
     }
 }
 
@@ -139,7 +139,7 @@ impl Sub for Time {
 
     fn sub(self, rhs: Self) -> Self {
         self.checked_sub(rhs)
-            .expect("subtract invalid times or overflow when subtracting times")
+            .expect("invalid values or overflow when subtracting times")
     }
 }
 
@@ -154,7 +154,7 @@ impl Mul<i32> for Time {
 
     fn mul(self, rhs: i32) -> Self {
         self.checked_mul(rhs)
-            .expect("multiply invalid time or overflow when multiplying time by scalar")
+            .expect("invalid values or overflow when multiplying time by scalar")
     }
 }
 
@@ -169,7 +169,7 @@ impl Div<i32> for Time {
 
     fn div(self, rhs: i32) -> Time {
         self.checked_div(rhs)
-            .expect("divide invalid time or divide by zero when dividing time by scalar")
+            .expect("invalid values or divide by zero error when dividing time by scalar")
     }
 }
 

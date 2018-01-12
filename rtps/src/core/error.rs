@@ -71,4 +71,7 @@ pub enum ErrorKind {
     #[fail(display = "{}", _0)] Io(#[cause] std::io::Error),
     #[fail(display = "{}", _0)] TryFromInt(#[cause] std::num::TryFromIntError),
     #[fail(display = "{}", _0)] SystemTime(#[cause] std::time::SystemTimeError),
+    #[fail(display = "invalid length: {}", _0)] InvalidLength(usize),
+    #[fail(display = "invalid range")] InvalidRange,
+    #[fail(display = "invalid value")] InvalidValue,
 }

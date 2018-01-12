@@ -1,4 +1,6 @@
-use std::{default::Default, ops::{Add, AddAssign, Sub, SubAssign}};
+use std::{convert::{TryFrom, TryInto}, default::Default, ops::{Add, AddAssign, Sub, SubAssign}};
+
+use core::error::{Error, ErrorKind, Result};
 
 /// Type used to hold sequence numbers.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
@@ -21,6 +23,11 @@ impl SequenceNumber {
     #[inline]
     pub fn zero() -> Self {
         SequenceNumber::new(0, 0)
+    }
+
+    #[inline]
+    pub fn into_inner(self) -> i64 {
+        self.into()
     }
 
     #[inline]
@@ -169,13 +176,157 @@ impl From<i64> for SequenceNumber {
 
 impl Into<i64> for SequenceNumber {
     fn into(self) -> i64 {
-        (self.high as i64) << 32 + self.low as i64
+        (self.high as i64) * 0x100000000 + self.low as i64
+    }
+}
+
+/// Type used to hold information about individual sequence numbers within a range.
+pub trait SequenceNumberSet {
+    fn base(&self) -> SequenceNumber;
+    fn num_bits(&self) -> u32;
+    fn bitmaps(&self) -> Vec<u32>;
+}
+
+macro_rules! sequence_number_set {
+    ( $name:ident, $bitmap_size:expr ) => {
+        #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+        pub struct $name {
+            base: SequenceNumber,
+            num_bits: u32,
+            bitmaps: [u32; $bitmap_size],
+        }
+
+        impl SequenceNumberSet for $name {
+            fn base(&self) -> SequenceNumber {
+                self.base
+            }
+
+            fn num_bits(&self) -> u32 {
+                self.num_bits
+            }
+
+            fn bitmaps(&self) -> Vec<u32> {
+                self.bitmaps.as_ref().into()
+            }
+        }
+    };
+}
+
+sequence_number_set!(SequenceNumberSet1, 1);
+sequence_number_set!(SequenceNumberSet2, 2);
+sequence_number_set!(SequenceNumberSet3, 3);
+sequence_number_set!(SequenceNumberSet4, 4);
+sequence_number_set!(SequenceNumberSet5, 5);
+sequence_number_set!(SequenceNumberSet6, 6);
+sequence_number_set!(SequenceNumberSet7, 7);
+sequence_number_set!(SequenceNumberSet8, 8);
+
+impl TryFrom<Vec<SequenceNumber>> for Box<SequenceNumberSet> {
+    type Error = Error;
+
+    fn try_from(v: Vec<SequenceNumber>) -> Result<Self> {
+        if v.len() < 1 || v.len() > 256 {
+            return Err(ErrorKind::InvalidLength(v.len()).into());
+        }
+
+        let mut v = v;
+        v.sort_unstable();
+
+        let range = (v.last().unwrap() - v.first().unwrap()).into_inner();
+        if range > 255 {
+            return Err(ErrorKind::InvalidRange.into());
+        } else if v.first().unwrap().into_inner() < 1 {
+            return Err(ErrorKind::InvalidValue.into());
+        }
+
+        let (mut bitmaps, _, map) = v.iter().skip(1).fold(
+            (vec![], v.first().unwrap().into_inner(), 1u32),
+            |mut acc, &n| {
+                let (base, bitmap) = if n.into_inner() - acc.1 > 31 {
+                    acc.0.push(acc.2);
+                    (acc.1 + 32, 0u32)
+                } else {
+                    (acc.1, acc.2)
+                };
+                let shift = n.into_inner() - base;
+                (acc.0, base, bitmap | (1u32 << shift))
+            },
+        );
+        bitmaps.push(map);
+
+        match range / 32 + 1 {
+            1 => {
+                let maps: &[u32; 1] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet1 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            2 => {
+                let maps: &[u32; 2] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet2 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            3 => {
+                let maps: &[u32; 3] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet3 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            4 => {
+                let maps: &[u32; 4] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet4 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            5 => {
+                let maps: &[u32; 5] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet5 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            6 => {
+                let maps: &[u32; 6] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet6 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            7 => {
+                let maps: &[u32; 7] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet7 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            8 => {
+                let maps: &[u32; 8] = bitmaps.as_slice().try_into().unwrap();
+                Ok(Box::new(SequenceNumberSet8 {
+                    base: *v.first().unwrap(),
+                    num_bits: (range + 1) as _,
+                    bitmaps: *maps,
+                }))
+            }
+            _ => unreachable!(),
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::SequenceNumber;
+    use super::{SequenceNumber, SequenceNumberSet};
 
     #[test]
     fn sequence_number() {
@@ -272,5 +423,25 @@ mod tests {
         assert!(SequenceNumber::new(0, 0) < SequenceNumber::new(0, 1));
         assert!(SequenceNumber::new(0, 1) < SequenceNumber::new(1, 0));
         assert!(SequenceNumber::new(1, 0) < SequenceNumber::new(1, 1));
+    }
+
+    #[test]
+    fn sequence_number_set() {
+        use std::convert::TryInto;
+
+        let set: Box<SequenceNumberSet> = (1i64..100)
+            .map(|i| SequenceNumber::from(i * 2))
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+        assert_eq!(SequenceNumber::from(2), set.base());
+        assert_eq!(197, set.num_bits());
+        assert_eq!(0b1010101010101010101010101010101, set.bitmaps()[0]);
+        assert_eq!(0b1010101010101010101010101010101, set.bitmaps()[1]);
+        assert_eq!(0b1010101010101010101010101010101, set.bitmaps()[2]);
+        assert_eq!(0b1010101010101010101010101010101, set.bitmaps()[3]);
+        assert_eq!(0b1010101010101010101010101010101, set.bitmaps()[4]);
+        assert_eq!(0b1010101010101010101010101010101, set.bitmaps()[5]);
+        assert_eq!(0b10101, set.bitmaps()[6]);
     }
 }

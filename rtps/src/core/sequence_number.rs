@@ -62,7 +62,7 @@ impl SequenceNumber {
     }
 }
 
-impl Add for SequenceNumber {
+impl Add<SequenceNumber> for SequenceNumber {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -71,9 +71,39 @@ impl Add for SequenceNumber {
     }
 }
 
+impl<'a> Add<&'a SequenceNumber> for SequenceNumber {
+    type Output = <SequenceNumber as Add<SequenceNumber>>::Output;
+
+    fn add(self, rhs: &'a SequenceNumber) -> Self::Output {
+        self.add(*rhs)
+    }
+}
+
+impl<'a> Add<SequenceNumber> for &'a SequenceNumber {
+    type Output = <SequenceNumber as Add<SequenceNumber>>::Output;
+
+    fn add(self, rhs: SequenceNumber) -> Self::Output {
+        SequenceNumber::add(*self, rhs)
+    }
+}
+
+impl<'a, 'b> Add<&'a SequenceNumber> for &'b SequenceNumber {
+    type Output = <SequenceNumber as Add<SequenceNumber>>::Output;
+
+    fn add(self, rhs: &'a SequenceNumber) -> Self::Output {
+        SequenceNumber::add(*self, *rhs)
+    }
+}
+
 impl AddAssign for SequenceNumber {
     fn add_assign(&mut self, rhs: Self) {
         *self = *self + rhs;
+    }
+}
+
+impl<'a> AddAssign<&'a SequenceNumber> for SequenceNumber {
+    fn add_assign(&mut self, rhs: &'a Self) {
+        self.add_assign(*rhs)
     }
 }
 
@@ -86,9 +116,39 @@ impl Sub for SequenceNumber {
     }
 }
 
+impl<'a> Sub<&'a SequenceNumber> for SequenceNumber {
+    type Output = <SequenceNumber as Sub<SequenceNumber>>::Output;
+
+    fn sub(self, rhs: &'a SequenceNumber) -> Self::Output {
+        self.sub(*rhs)
+    }
+}
+
+impl<'a> Sub<SequenceNumber> for &'a SequenceNumber {
+    type Output = <SequenceNumber as Sub<SequenceNumber>>::Output;
+
+    fn sub(self, rhs: SequenceNumber) -> Self::Output {
+        SequenceNumber::sub(*self, rhs)
+    }
+}
+
+impl<'a, 'b> Sub<&'a SequenceNumber> for &'b SequenceNumber {
+    type Output = <SequenceNumber as Sub<SequenceNumber>>::Output;
+
+    fn sub(self, rhs: &'a SequenceNumber) -> Self::Output {
+        SequenceNumber::sub(*self, *rhs)
+    }
+}
+
 impl SubAssign for SequenceNumber {
     fn sub_assign(&mut self, rhs: Self) {
         *self = *self - rhs;
+    }
+}
+
+impl<'a> SubAssign<&'a SequenceNumber> for SequenceNumber {
+    fn sub_assign(&mut self, rhs: &'a Self) {
+        self.sub_assign(*rhs)
     }
 }
 
@@ -155,15 +215,15 @@ mod tests {
     #[test]
     fn add_assign() {
         let mut n = SequenceNumber::zero();
-        n += 1.into();
-        n += 1.into();
+        n += SequenceNumber::from(1);
+        n += &SequenceNumber::from(1);
         assert_eq!(SequenceNumber::new(0, 2), n);
     }
 
     #[test]
     #[should_panic]
     fn invalid_add() {
-        SequenceNumber::unknown() + 1.into();
+        SequenceNumber::unknown() + SequenceNumber::from(1);
     }
 
     #[test]
@@ -196,15 +256,15 @@ mod tests {
     #[test]
     fn sub_assign() {
         let mut n = SequenceNumber::new(1, 5);
-        n -= 1.into();
-        n -= 1.into();
+        n -= SequenceNumber::from(1);
+        n -= &SequenceNumber::from(1);
         assert_eq!(SequenceNumber::new(1, 3), n);
     }
 
     #[test]
     #[should_panic]
     fn invalid_sub() {
-        SequenceNumber::unknown() - 1.into();
+        SequenceNumber::unknown() - SequenceNumber::from(1);
     }
 
     #[test]

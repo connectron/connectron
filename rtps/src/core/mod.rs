@@ -1,10 +1,12 @@
 mod error;
+mod fragment_number;
 mod guid;
 mod locator;
 mod sequence_number;
 mod time;
 
 pub use self::error::{Error, ErrorKind, Result};
+pub use self::fragment_number::{FragmentNumber, FragmentNumberSet};
 pub use self::guid::{EntityId, Guid, GuidPrefix};
 pub use self::locator::{Locator, LocatorKind};
 pub use self::sequence_number::{SequenceNumber, SequenceNumberSet};

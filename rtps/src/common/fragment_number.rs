@@ -1,6 +1,6 @@
 use std::convert::{TryFrom, TryInto};
 
-use core::error::{Error, ErrorKind, Result};
+use common::error::{Error, ErrorKind, Result};
 
 /// Type used to hold fragment numbers.
 pub type FragmentNumber = u32;

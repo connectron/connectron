@@ -1,6 +1,6 @@
 use std::{convert::{TryFrom, TryInto}, default::Default, ops::{Add, AddAssign, Sub, SubAssign}};
 
-use core::error::{Error, ErrorKind, Result};
+use common::error::{Error, ErrorKind, Result};
 
 /// Type used to hold sequence numbers.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]

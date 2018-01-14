@@ -2,7 +2,7 @@ use std::{self, convert::{TryFrom, TryInto},
           ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
           time::{SystemTime, UNIX_EPOCH}};
 
-use core::{Error, Result};
+use common::{Error, Result};
 
 /// Type used to hold a timestamp.
 ///

@@ -10,4 +10,4 @@ extern crate serde_derive;
 #[cfg(test)]
 extern crate serde_test;
 
-pub mod core;
+pub mod common;

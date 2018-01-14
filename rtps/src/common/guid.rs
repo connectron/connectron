@@ -1,6 +1,6 @@
 use std::{mem, default::Default, net::IpAddr, ops::{Deref, DerefMut}};
 
-use core::VendorId;
+use common::VendorId;
 use libc;
 use pnet;
 
@@ -283,7 +283,7 @@ mod tests {
         use libc;
 
         use super::GuidPrefix;
-        use core::VendorId;
+        use common::VendorId;
 
         assert_eq!([0; 12], *GuidPrefix::unknown());
 

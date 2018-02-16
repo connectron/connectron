@@ -1,4 +1,4 @@
-#![feature(try_from, use_nested_groups)]
+#![feature(try_from)]
 
 extern crate failure;
 #[macro_use]

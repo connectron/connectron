@@ -45,7 +45,7 @@ after_success:
       tar xzf master.tar.gz && mkdir -p kcov-master/build && cd kcov-master/build
       cmake .. && make && make install DESTDIR=../../kcov-build && cd ../..
       rm -rf kcov-master
-      for f in target/debug/connectron*-*[^\.d]; do
+      for f in $(find target/debug -maxdepth 1 -executable -not -regex .*\\.d$ -and -regex .*connectron.*); do
         mkdir -p "target/cov/$(basename $f)"
         ./kcov-build/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $f)" "$f"
       done

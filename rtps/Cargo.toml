@@ -19,7 +19,7 @@ codecov = { repository = "connectron/connectron" }
 failure = "0.1"
 failure_derive = "0.1"
 libc = "0.2"
-pnet = "0.20"
+pnet = "0.21"
 serde = "1.0"
 serde_derive = "1.0"
 
